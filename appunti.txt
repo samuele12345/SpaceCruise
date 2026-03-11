@@ -1,0 +1,22 @@
+- tenere conto dei diritti png tree
+
+- nella pagina destinations inserire i pianeti con immagini viste dal suolo del pianeta stesso e descrizione più approfondita rispetto alla pagina principale, fauna e cultura locale
+
+- pensare di aggiungere alle immagini della fauna un leggero scroll laterale che le facci sembrare animate
+
+- migliorare l'animazione delle fiamme
+
+
+
+- nel div, offer (quello dove c'è il pianeta random e le due navicelle) aggiungere due pianeti ai lati destro e sinistro blurrati che NON sono il pianeta centrale ma fanno sempre parte dell'array di immagini di pianeti, almeno si riempie meglio lo spazio
+
+-nella sezione flights mettere l'immagine di un razzo visto da dietro che si dirige verso un pianeta, aggiungere sezione pagamenti con stripe e loro registrazione in pg admin
+
+-aggungere gioco simile a flappy bird con navicella che schiva meteoriti
+
+- aggiungere database per il login, oltre a pagina dedicata
+
+-AGGIUNGERE GLI HOVER NELLA NAV BAR
+
+
+
