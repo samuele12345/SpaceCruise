@@ -22,6 +22,7 @@
             <img id="img-ship-3" src="img//spaceship-5.png">
         </div>
         
+        
         <header>
             <div class="header-div">
                 <nav>
@@ -50,18 +51,30 @@
                         <div id="link-list-div">
                             <ul id="link-list">
                                 <li class="link">
-                                    <details>
-                                        <summary class="summaries" ><a href="home.html">Earth</a></summary>
+                                    <a href="home.html">Earth</a>
+                                        <!--
                                         <ul class="drop-down">
                                             <li><a href="#medio">Business</a></li>
                                             <li><a href="#rand-off">Catalogue</a></li>
                                         </ul>
-                                    </details>
+                                        
+                                        -->
+                                    
+                                    <div class="arrow-cont">
+                                        <div class="arrow">
+
+                                        </div>
+                                    </div>
                                 </li>
+                                
 
                                 <li class="link">
-                                    <details>
-                                        <summary class="summaries"><a href="destinations.html">Destinations</a></summary>
+                                    
+                                    <a href="destinations.html">Destinations</a>
+                                        
+                                    
+
+                                    <!--
                                         <ul class="drop-down">
                                             <li><a href="#navic-dest">Introduction</a></li>
                                             <li><a href="#">Moon</a></li>
@@ -70,18 +83,34 @@
                                             <li><a href="#">Uranus</a></li>
                                             <li><a href="#">Neptune</a></li>
                                         </ul>
-                                    </details>
+                                        
+                                        -->
+                                    <div class="arrow-cont">
+                                        <div class="arrow">
+
+                                        </div>
+                                    </div>
+                                    
                                 </li>
 
 
                                 <li class="link">
-                                    <details>
-                                        <summary class="summaries"><a href="#">Flights</a></summary>
+                                    
+                                    <a href="#">Flights</a>
+                                    
+
+                                    <!--
                                         <ul class="drop-down">
                                             <li><a href="#">Offers</a></li>
                                             <li><a href="#">Specials</a></li>
                                         </ul>
-                                    </details>
+                                        
+                                        -->
+                                    <div class="arrow-cont">
+                                        <div class="arrow">
+
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                         </div>
@@ -91,6 +120,19 @@
 
                 
             </div>
+            <div id="cont-drops">
+                <div class="drop" id="drop0">
+                    <!--mettere immagini, descrisione e link alle commponenti delle pagine-->
+                    <!--copia-incollare l'header in tutte le pagine-->
+                </div>
+                <div class="drop" id="drop1">
+
+                </div>
+                <div class="drop" id="drop2">
+
+                </div>
+            </div>
+            
             
         </header>
 
@@ -98,15 +140,152 @@
             <div id="main-div">
                 <div   id="main-div1">
                     <div class="main-img-div">
-                        <img src="img\Main-poster.png">
+                        <img src=".\img\Terra e razzo nello spazio.png">
+                            <!--
+                                Titolo curvo costruito con SVG.
+                                Il testo non viene deformato via CSS: segue un tracciato definito nel <path>.
+
+                                SVG = grafica vettoriale scalabile.
+                                Serve quando vuoi disegnare forme, linee o testo su percorsi precisi,
+                                senza perdere qualita' al ridimensionamento.
+                            -->
+                            <!--
+                                viewBox="0 0 900 220" definisce il sistema di coordinate interno dell'SVG.
+                                In pratica l'SVG ragiona come se avesse larghezza 900 e altezza 220,
+                                anche quando viene ridimensionato via CSS.
+                                Questo permette a path e testo di restare proporzionati.
+                            -->
+                            <svg class="hero-curved-title" viewBox="0 0 900 220" aria-label="Welcome to SpaceCruise!" role="img">
+                                <!--
+                                    <defs> contiene definizioni "di servizio" dell'SVG.
+                                    Gli elementi qui dentro non vengono mostrati da soli sulla pagina,
+                                    ma possono essere richiamati dopo da altri elementi SVG.
+
+                                    In questo caso il path viene definito qui e poi usato da <textPath>
+                                    come guida per curvare il testo.
+                                -->
+                                <defs>
+                                    <!--
+                                        Questo path definisce la curva guida del testo.
+
+                                        M 40 96
+                                        -> "Move to": punto iniziale del tracciato, piu' esterno a sinistra.
+
+                                        Q 450 38 860 96
+                                        -> Curva di Bezier quadratica.
+                                        -> 450 38 e' il punto di controllo: alza il centro della curva
+                                           in modo piu' evidente rispetto a prima.
+                                        -> 860 96 e' il punto finale del tracciato, piu' esterno a destra.
+
+                                        In pratica:
+                                        - 40 e 860 allungano di piu' il tracciato ai lati
+                                        - 96 e 96 tengono le estremita' alla stessa altezza
+                                        - 38 al centro crea una curvatura piu' marcata verso l'alto
+                                        - il path piu' lungo lascia spazio anche al punto esclamativo finale
+
+                                        Qui il path e' stato allungato e leggermente rialzato al centro,
+                                        perche' il titolo principale e' stato ingrandito via CSS
+                                        e l'ultimo carattere rischiava di uscire dalla parte utile della curva.
+
+                                        Se vuoi piu' curvatura:
+                                        - diminuisci 38, per esempio 28 o 22
+                                        Se vuoi meno curvatura:
+                                        - aumenta 38, per esempio 48 o 58
+                                    -->
+                                    <path id="hero-title-curve" d="M 40 96 Q 450 38 860 96"></path>
+                                </defs>
+                                <!--
+                                    Il testo segue il path tramite textPath.
+                                    startOffset="50%" centra il testo lungo la curva.
+                                    text-anchor="middle" mantiene il testo bilanciato rispetto al centro.
+                                -->
+                                <text>
+                                    <textPath href="#hero-title-curve" startOffset="50%" text-anchor="middle">Welcome to SpaceCruise!</textPath>
+                                </text>
+                            </svg>
+                        <h2>Your journey starts now<span class="punto">.</span><span class="punto">.</span><span class="punto">.</span></h2>
                     </div>
+                </div>
+
+                    
+
+                <div id="div-book">
+                    <div id="sep">
+                        <div class="div-un-img">
+
+                        </div>
+                        <div class="div-un-img">
+                            
+                        </div>
+                        <div class="div-un-img">
+                            
+                        </div>
+                    </div>
+                    <div id="tit-un">
+
+                        <p class="p-tit-un">"SpaceCruise offers reliable service, premium comfort, and a smooth travel experience."
+Source: Stellar Travel Review Institute</p>
+
+                        <!--
+                            Questo secondo SVG usa un viewBox coerente con il path.
+                            Prima il viewBox era troppo stretto rispetto alla curva,
+                            quindi il textPath risultava visivamente spostato verso destra.
+                        -->
+                        <svg class="hero-curved-title2" viewBox="0 0 900 140" aria-label="Book your flight now!" role="img">
+                                <!--
+                                    <defs> contiene definizioni "di servizio" dell'SVG.
+                                    Gli elementi qui dentro non vengono mostrati da soli sulla pagina,
+                                    ma possono essere richiamati dopo da altri elementi SVG.
+
+                                    In questo caso il path viene definito qui e poi usato da <textPath>
+                                    come guida per curvare il testo.
+                                -->
+                                <defs>
+                                    <!--
+                                        Questo path definisce la curva guida del titolo centrale.
+
+                                        M 80 36
+                                        -> "Move to": punto iniziale del tracciato, a sinistra.
+
+                                        Q 450 90 820 36
+                                        -> Curva di Bezier quadratica.
+                                        -> 450 90 e' il punto di controllo: abbassa il centro della curva,
+                                           cosi' il testo forma un arco verso il basso.
+                                        -> 820 36 e' il punto finale del tracciato, a destra.
+
+                                        In pratica:
+                                        - 80 e 820 tengono il tracciato piu' raccolto rispetto al titolo principale
+                                        - 36 e 36 mantengono le estremita' alla stessa altezza
+                                        - 90 al centro crea una discesa morbida e simmetrica
+                                        - questa forma funziona bene per il titolo corto tra le due recensioni
+
+                                        Se vuoi un arco piu' profondo:
+                                        - aumenta 90, per esempio 100 o 110
+                                        Se vuoi un arco piu' leggero:
+                                        - diminuisci 90, per esempio 75 o 65
+                                    -->
+                                    <path id="hero-title-curve2" d="M 80 36 Q 450 90 820 36"></path>
+                                </defs>
+                                <!--
+                                    Il testo segue il path tramite textPath.
+                                    startOffset="50%" centra il testo lungo la curva.
+                                    text-anchor="middle" mantiene il testo bilanciato rispetto al centro.
+                                -->
+                                <text>
+                                    <textPath href="#hero-title-curve2" startOffset="50%" text-anchor="middle">Book your flight now!</textPath>
+                                </text>
+                            </svg>
+
+                            <p class="p-tit-un">"Professional, modern, and passenger-focused, SpaceCruise is a trusted name in space travel."
+Source: International Aerospace Hospitality Board</p>
+                    </div>
+                    
                 </div>
 
                 <div id="medio" class="scroll-card2 visible">
 
                     <div class="par-divs" id="par-div1-home">
                         <h2 class="tit-par-div"><strong>Our Business</strong></h2>
-                        <div class="wave-hr1"></div>
                         <p class="p-div">Founded in 2108, SpaceCruise has become the galaxy’s premier interplanetary travel company by 2126, offering unforgettable journeys across planets, moons, and celestial wonders. From luxury orbital cruises around Earth to thrilling expeditions to Mars’ rust-red plains, Europa’s icy oceans, and even the dazzling rings of Saturn, SpaceCruise turns the dream of space exploration into a reality.
 
     Our mission is simple: to make the universe accessible to explorers of all ages, backgrounds, and ambitions. Every journey combines cutting-edge spacecraft technology, zero-gravity leisure experiences, and expert-guided tours through the cosmos. Whether it’s a relaxing orbital retreat, an adventurous lunar hike, or an awe-inspiring flyby of a distant exoplanet, SpaceCruise ensures your holiday is not just a trip — it’s a voyage beyond imagination.
@@ -114,27 +293,28 @@
     With a commitment to safety, sustainability, and stellar hospitality, SpaceCruise is more than a travel company; it’s a doorway to the stars. In 2126, the cosmos is closer than ever, and your next holiday could be light-years away.
                         </p>
                         
+                        <div id="min-div-bot">
+                            <h4 id="power-up"><strong>Power up the boosters!</strong></h4>
+                            <div id="div-bot1">
+                                <div class="hr-bot" id="hr-bot-left"></div>
+                                <button id="accensione"></button>
+                                <div class="hr-bot" id="hr-bot-right"></div>
+                            </div>
+                        </div>
                         
                     </div>
 
-                    <div id="min-div-bot">
-                        <h4 id="power-up"><strong>Power up the boosters!</strong></h4>
-                        <div id="div-bot1">
-                            <div class="hr-bot" id="hr-bot-left"></div>
-                            <button id="accensione"></button>
-                            <div class="hr-bot" id="hr-bot-right"></div>
-                        </div>
-                    </div>
+                    
                         
 
                 </div>
 
                 
 
-                <div class="linea-oriz"><hr></div>
-
                 <div class="random-offer scroll-card" id="rand-off">
                     
+                    
+
                     <div id="div-img-planet">
                         
                         <!--aggiungere le navicelle per gli altri pianeti-->
@@ -187,7 +367,6 @@
                     </div>
                     <div class="par-divs scroll-card2 visible">
                         <h2 class="tit-par-div" id="desc-tit"><strong></strong></h2>
-                        <div class="wave-hr2"></div>
                         <p class="p-div" id="desc-offer"></p>
                     </div>
                 </div>

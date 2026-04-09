@@ -9,9 +9,14 @@ html, body{
     overflow-x: hidden; /* impedisce lo scroll orizzontale */
 }
 
+html::-webkit-scrollbar {
+    display: none;
+}
+
 header, nav {
     overflow: visible; /* permette a position: sticky di funzionare */
     width: 100%; /* importante per sticky */
+    position: relative;
 }
 
 nav {
@@ -19,8 +24,9 @@ nav {
 }
 
 body{
-    background: linear-gradient(90deg, brown, #C89D7C, brown) ; /* sfondo sfumato orizzontale */
-    
+    /*background: linear-gradient(90deg, brown, #C89D7C, brown) ;  sfondo sfumato orizzontale 
+    */
+    background: rgb(243, 228, 162);
 }
 
 #div-mascotte1{
@@ -74,15 +80,17 @@ body{
     top: 0px; /* posizione superiore */
     width: 100%; /* occupa tutta la larghezza */
     height: 35px; /* altezza barra */
-    border-top: 2px solid #CFB53B; /* bordo superiore oro */
-    border-bottom: 2px solid #CFB53B; /* bordo inferiore oro */
-    background: rgba(194, 164, 109, 0.4); /* colore sfondo con opacità solo al background */
+    background: rgba(213, 181, 120, 0.9); /* colore sfondo con opacità solo al background */
     box-shadow: 0px 0px 5px 5px black; /* ombra esterna */
     z-index: 999; /* sopra altri elementi */
-    left: 0; /* allinea a sinistra */
+    
+    
 }
 
-
+#link-list-div{
+    max-width: 400px;
+    width: auto;
+}
 
 #link-list-div > ul{
     position: relative; /* riferimento per eventuali elementi assoluti interni */
@@ -91,16 +99,109 @@ body{
     gap: 10px; /* spazio tra voci */
     list-style: none; /* rimuove pallini lista */
     padding-right: 20px; /* spazio a destra */
-    width: 500px;
+    width: auto;
+    max-width: 400px;
 }
 
-.summaries{
+#nav-div a{
+    /*
+        summary mostra di default una freccia nativa del browser.
+        Quella freccia e' comoda, ma e' difficile da personalizzare davvero:
+        forma, spessore, animazione e allineamento dipendono dal browser.
+
+        Qui quindi trattiamo il summary come un piccolo contenitore inline-flex,
+        cosi' possiamo posizionare una freccia disegnata da noi con ::after.
+        padding-right lascia lo spazio visivo dove verra' messa la freccia custom.
+    */
+    cursor: pointer;
+    list-style: none;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 5px;
+    padding-left: 10px;
+}
+
+.summaries::-webkit-details-marker{
+    /* Chrome, Edge e Safari usano questo pseudo-elemento per la freccia nativa. */
+    display: none;
+}
+
+.summaries::marker{
+    /* Firefox usa il marker standard: lo svuotiamo per evitare doppie frecce. */
+    content: "";
+}
+
+.arrow{
+    /*
+        Questa e' la freccia custom.
+
+        Invece di usare un carattere tipo > o v, creiamo una piccola L usando:
+        - border-right
+        - border-bottom
+
+        Poi ruotiamo quella L di 45 gradi.
+        Il risultato visivo e' una chevron moderna, piu pulita della freccia nativa.
+
+        width e height definiscono la dimensione della freccia.
+        position: absolute la ancora dentro il summary.
+        right: 2px la sposta vicino al bordo destro del testo.
+        top: 50% la allinea verticalmente a meta del summary.
+
+        translateY serve a rifinire l'allineamento verticale reale.
+        rotate(45deg) trasforma i due bordi in una freccia verso il basso/destra,
+        che viene percepita come indicatore di menu chiuso.
+    */
+    content: "";
+    right: 2px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    /*
+        La freccia adesso ha un colore indipendente dal link.
+        Usiamo direttamente silver invece di currentColor, cosi' il testo <a>
+        puo' diventare blu in hover senza trascinarsi dietro anche la freccia.
+    */
+    border-right: 2px solid black;
+    border-bottom: 2px solid black;
+    transform: translateY(-65%) rotate(45deg);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    margin-top: 5px;
+}
+
+.link{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+}
+
+.arrow:hover{
+    /*
+        Quando il mouse entra nel summary, la freccia diventerebbe blu.
+        Questo include anche la sua zona a destra, cioe' l'area dove si percepisce hover "sulla freccia".
+    */
+    border-color: #7b7be0;
     cursor: pointer;
 }
 
-.summaries:hover{
-    background: linear-gradient(transparent, #191970, transparent);
+
+.arrow.clicked{
+    /*
+        Quando il details e' aperto ruotiamo la stessa freccia.
+        Non ne creiamo una nuova: riusiamo la stessa forma e cambiamo solo transform.
+
+        rotate(-135deg) la fa puntare verso l'alto,
+        mentre translateY viene regolato di nuovo per mantenerla centrata otticamente.
+
+        In piu' la teniamo blu in modo fisso quando il dropdown e' aperto,
+        anche se il mouse non e' piu sopra la freccia.
+    */
+    border-color: #7b7be0;
+    transform: translateY(-35%) rotate(-135deg);
 }
+
 
 #main-title{
     font-family: 'Lobster'; /* font decorativo */
@@ -112,9 +213,70 @@ body{
         1px  1px 0 black;  /* ombra basso-destra */
     display: flex;
     align-items: center;
-    border-left: 2px solid silver;
-    border-right: 2px solid silver;
-    border-radius: 50px;
+    justify-content: center;
+    width: auto;
+}
+
+#div-book{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    background: linear-gradient(transparent, rgb(207, 192, 126))
+}
+
+#tit-un > h2{
+    z-index: 20;
+    display: flex;
+    align-items: flex-start;
+    height: auto;
+    max-width: 150px;
+    margin-bottom: 70px;
+    
+}
+
+#tit-un{
+    width: min(100%, 1200px);
+    min-height: 130px;
+    padding: 0 32px;
+    box-sizing: border-box;
+    /* Tre colonne simmetriche: recensione, titolo, recensione. */
+    display: grid;
+    /*
+        Le colonne laterali usano 1fr e quindi si dividono lo stesso spazio disponibile.
+        La colonna centrale usa auto e prende solo lo spazio necessario al titolo.
+        In questo modo il titolo resta davvero al centro tra i due testi laterali.
+    */
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+}
+
+.p-tit-un{
+    color: rgb(246, 226, 138);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: center;
+    text-shadow: 1px 1px 2px black;
+    font-weight: 400;
+    margin-bottom: 30px;
+    width: 100%;
+    min-width: 350px;
+    justify-self: center;
+    
+}
+
+
+
+.p-tit-un:first-of-type{
+    justify-self: end;
+}
+
+.p-tit-un:last-of-type{
+    justify-self: start;
 }
 
 #main-t{
@@ -126,11 +288,12 @@ body{
 
 #main-tit-text{
     padding-bottom: 5px;
+    
 }
 
 #nav-div a{
     text-decoration: none; /* rimuove sottolineatura */
-    font-family: 'Pacifico'; /* font decorativo */
+    font-family: sans-serif;
     color: silver; /* colore testo */
     text-shadow: 
         -1px -1px 0 black, /* ombra alto-sinistra */
@@ -138,6 +301,59 @@ body{
         -1px  1px 0 black, /* ombra basso-sinistra */
         1px  1px 0 black;  /* ombra basso-destra */
 }
+
+#nav-div a:hover{
+    color: #7b7be0;
+}
+
+
+.drop{
+    visibility: hidden;
+    width: 85%;
+    height: 300px;
+    background: rgba(74, 74, 93, 0.9);
+    box-shadow: 2px 2px 10px rgb(162, 161, 161);
+    position: fixed;
+    z-index: 998;
+    margin: auto;
+    top: 35px;
+    border-radius: 0px 0px 10px 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+#cont-drops{
+    visibility: hidden;
+    width: 100%;
+    height: 300px;
+    position: fixed;
+    z-index: 997;
+    margin: auto;
+    top: 35px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.drop.vis{
+    visibility: visible;
+}
+
+.arrow-cont{
+    height: 25px;
+    width: auto;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 
 .drop-down{
     margin: 0;
@@ -157,7 +373,15 @@ body{
     gap: 10px;
     align-items: center;
     padding-left: 20px;
-    width:500px;
+    width: auto;
+    max-width:400px;
+}
+
+@media(max-width: 900px){
+    #div-logo > a{
+        scale: 0.8;
+        text-align: center;
+    }
 }
 
 #rocket{
@@ -205,7 +429,7 @@ body{
 }
 
 #main-div1{
-    margin-top: 40px;
+    margin-top: 0px;
     width: 100%;
     height: auto;
     will-change: transform, opacity;
@@ -241,10 +465,11 @@ body{
 
 
 .main-img-div{
+    position: relative;
     display:flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
-    width: 1110px; /* larghezza contenitore */
+    width: 90%; /* larghezza contenitore */
     height: auto; /* altezza automatica */
     border-radius: 3px; /* angoli arrotondati */
     padding: 0px; /* nessun padding */
@@ -252,19 +477,264 @@ body{
     margin-right: auto; /* centra orizzontalmente */
     cursor: pointer;
     transform-origin: center center;
-  transition: transform 0.2s ease-out, filter 0.2s ease-out;
-    
-  
+    transition: transform 0.2s ease-out, filter 0.2s ease-out;
+    height: 113vh;
+    align-items: center;
+}
+
+.main-img-div h1 {
+    z-index: 10;
+    color: rgb(246, 226, 138);
+    font-size: 80px;
+    text-shadow: 
+        -5px -5px 0 black, /* ombra alto-sinistra */
+        5px -5px 0 black,  /* ombra alto-destra */
+        -5px  5px 0 black, /* ombra basso-sinistra */
+        5px  5px 0 black;  /* ombra basso-destra */
+    cursor: default;
+}
+
+#sep{
+    width: 100%;
+    height: 500px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-items: center;
+    align-items: start;
+    position: relative;
+    z-index: 0;
+    margin-top: -170px;
+    padding-top: 30px;
+    gap: 150px;
+}
+
+.div-un-img{
+    width: 140%;
+    height: 400px;
+    margin: 0;
+    z-index: 2;
+    border-radius: 10px;
+    animation: d-img 6s infinite;
+    cursor: pointer;
+}
+
+.div-un-img:hover{
+    scale: 1.01;
+    filter: brightness(105%);
+}
+
+@keyframes d-img{
+    0%{
+        background:rgb(73, 49, 12, 0.9)
+    }
+    25%{
+        background:rgba(103, 68, 16, 0.9)
+    }
+    50%{
+        background:rgba(119, 79, 20, 0.9)
+    }
+    75%{
+        background:rgba(103, 68, 16, 0.9)
+    }
+    100%{
+        background:rgb(73, 49, 12, 0.9)
+    }
+}
+
+.div-un-img:nth-of-type(1){
+    rotate: -5deg;
+    scale: 0.8;
+    opacity: 0.8;
+}
+
+.div-un-img:nth-of-type(1):hover{
+    rotate: -5deg;
+    scale: 0.81;
+    opacity: 0.8;
+}
+
+.div-un-img:nth-of-type(3){
+    rotate: 5deg;
+    scale: 0.8;
+    opacity: 0.8;
+}
+
+.div-un-img:nth-of-type(3):hover{
+    rotate: 5deg;
+    scale: 0.81;
+    opacity: 0.8;
+}
+
+.punto{
+    /* Ogni puntino parte invisibile e viene animato in loop. */
+    opacity: 0;
+    /* inline-block evita comportamenti strani dell'animazione sugli span inline puri. */
+    display: inline-block;
+    /* Tutti i puntini usano lo stesso keyframe; i delay sotto li sfalsano nel tempo. */
+    animation: point 1.8s infinite ease-in-out;
+}
+
+.punto:nth-of-type(1){
+    /* Primo puntino: parte subito. */
+    animation-delay: 0s;
+}
+
+.punto:nth-of-type(2){
+    /* Secondo puntino: parte poco dopo il primo. */
+    animation-delay: 0.3s;
+}
+
+.punto:nth-of-type(3){
+    /* Terzo puntino: parte per ultimo, completando la sequenza. */
+    animation-delay: 0.6s;
+}
+
+@keyframes point{
+    0%{
+        /* Inizio ciclo: puntino nascosto. */
+        opacity: 0;
+    }
+
+    25%{
+        /* Il puntino appare. */
+        opacity: 1;
+    }
+
+    55%{
+        /* Resta visibile per un breve momento. */
+        opacity: 1;
+    }
+
+    100%{
+        /* Fine ciclo: torna invisibile e poi ricomincia. */
+        opacity: 0;
+    }
+}
+
+.hero-curved-title {
+    width: min(96vw, 960px); /* usa il valore piu piccolo tra 93vw e 920px: si adatta allo schermo ma non supera 920px */
+    height: auto;
+    z-index: 10;
+    overflow: visible;
+    margin-top: 10px;
+    margin-bottom: -70px;
+    filter:
+        drop-shadow(4px 2px 0 rgba(32, 18, 8, 0.85))
+        drop-shadow(10px 7px 6px rgba(0, 0, 0, 0.45));
+    transform: translateY(18px);
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+.hero-curved-title2 {
+    /* Larghezza controllata via CSS, ma il centraggio reale dipende dal viewBox corretto nell'HTML. */
+    width: min(66vw, 700px); /* titolo piu leggibile, ma sempre contenuto tra le due recensioni */
+    height: auto;
+    z-index: 10;
+    overflow: visible;
+    margin-top: 0px;
+    filter:
+        drop-shadow(4px 2px 0 rgba(32, 18, 8, 0.85))
+        drop-shadow(10px 7px 6px rgba(0, 0, 0, 0.45));
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+}
+
+.hero-curved-title.visible{
+    animation: cur-tit 1.2s ease-out forwards;
+}
+
+@keyframes cur-tit{
+    0%{
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    60%{
+        opacity: 1;
+        transform: translateY(-4px);
+    }
+
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-curved-title text {
+    fill: rgb(246, 226, 138);
+    font-size: 68px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.hero-curved-title2 text {
+    fill: rgb(246, 226, 138);
+    font-size: 47px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.main-img-div h2 {
+    z-index: 10;
+    color: rgb(246, 226, 138);
+    font-size: 30px;
+    filter:
+        drop-shadow(4px 2px 0 rgba(32, 18, 8, 0.85))
+        drop-shadow(10px 7px 6px rgba(0, 0, 0, 0.45));
+}
+
+@media (max-width: 900px) {
+    .hero-curved-title text {
+        font-size: 48px;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero-curved-title text {
+        font-size: 34px;
+        letter-spacing: 1px;
+    }
+}
+
+
+
+@media (max-width: 1260px) {
+    #tit-un{
+        min-height: auto;
+        padding: 12px 20px 24px;
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .p-tit-un:first-of-type,
+    .p-tit-un:last-of-type{
+        justify-self: center;
+        min-width: 250px;
+    }
+
+    .hero-curved-title2 {
+        width: min(82vw, 500px);
+        margin-top: 0;
+    }
+
+    .hero-curved-title2 text {
+        font-size: 36px;
+    }
 }
 
 .main-img-div img {
     display: block;
     box-shadow: 0px 0px 2px 2px black; /* ombra */
     width: 100%;
+    z-index: 0;
     transform: scale(1);
     filter: blur(0px);
     opacity: 1; /* stato iniziale leggermente trasparente */
-
+    position: absolute;
     transition:
         transform 0.2s ease-out,
         filter 0.2s ease-out,
@@ -392,7 +862,6 @@ body{
     flex-direction: column;
     align-items: center;
     padding: 15px;
-    background: linear-gradient(90deg, transparent, silver, transparent);
 }
 
 .spaceship-button{
@@ -499,28 +968,32 @@ body{
     margin-top: 30px;
     margin-left: auto;
     margin-right: auto;
-    background: rgba(207, 181, 59, 0.9);
-    max-width: 1200px;
+    width: 100%;
     height: auto;
-    box-shadow: 0px 0px 1px 1px black;
-    border-radius: 5px;
-    padding: 5px;
+    padding: 10px 100px;
+    
 }
 
+
+
 .p-div{
+    margin-top: 20px;
+    font-size: 18px;
+    line-height: 30px; 
     margin-left: 10px;
     margin-right: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
+    font-weight: 500;
+    text-align: center;
 }
 
 .wave-hr1 {
     margin-bottom: 10px;
-    border: 2px solid brown;
-    height: 8px; /* altezza dell'onda */
-    width: 250px;
+    border: 1px solid brown;
+    height: 1px; /* altezza dell'onda */
+    width:100%;
     background: transparent;
     color: transparent;
-    border-radius: 100px;
 }
 
 .wave-hr2 {
@@ -542,6 +1015,9 @@ body{
         1px -1px 0 black,
         -1px  1px 0 black,
         1px  1px 0 black;
+    font-size: 50px;
+    background: linear-gradient(90deg, transparent, rgb(210, 179, 56), transparent);
+    padding: 1px 10px 1px 10px
 }
 
 #footer-div{
@@ -563,7 +1039,7 @@ body{
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 800px;
+    width: 100%;
     height: auto;
     object-fit: contain;
 }
@@ -573,11 +1049,13 @@ body{
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 30px;
+    width: 100%;
+    gap: clamp(8px, 1.8vw, 30px);
+    padding-inline: clamp(8px, 2vw, 24px);
 }
 
 #img-offer2{
-    width: 400px;
+    width: clamp(140px, 34vw, 400px);
     height: auto;
     object-fit: contain;
     margin: auto;
@@ -585,7 +1063,7 @@ body{
 }
 
 .img-offer1-3{
-    width: 250px;
+    width: clamp(90px, 22vw, 250px);
     height: auto;
     object-fit: contain;
     margin: auto;
@@ -599,7 +1077,7 @@ body{
 }
 
 .img-offer0-4{
-    width: 150px;
+    width: clamp(55px, 13vw, 150px);
     height: auto;
     object-fit: contain;
     margin: auto;
@@ -619,7 +1097,10 @@ body{
 
 .planet-wrapper {
     position: relative; /* solo il wrapper è relativo */
-    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 1 auto;
     cursor: pointer;
 }
 
@@ -645,12 +1126,19 @@ body{
     opacity: 1;
 }
 
+.ship-wrappers{
+    --ship-size: clamp(52px, 11vw, 150px);
+    /* Stato iniziale nascosto: evita che le navicelle si vedano gia' arrivate prima del trigger JS. */
+    opacity: 0;
+}
+
 #ship-wrapper-1 {
     position: absolute;
-    top: 20%;
-    left: -600px;
+    top: 46%;
+    left: 7%;
     z-index: 10;
     pointer-events: none; /* ignora completamente il mouse */
+    transform: translate(-220%, -120%) rotate(-7deg) scale(0.1);
 }
 
 #ship-wrapper-1.visible{
@@ -659,17 +1147,19 @@ body{
 
 #spaceship-1 {
     position: absolute;
-    width: 150px;
+    width: var(--ship-size);
     pointer-events: none;
+    opacity: 0;
 }
 
 #spaceship-1.visible{
+    opacity: 1;
     animation: floatY-1 2s ease-in-out infinite;
 }
 
 @keyframes fly-1 {
-    0% { opacity: 0.3; transform:  translateX(0) translateY(0px) rotate(-7deg) scale(0.1)}
-    100% { opacity: 0.4; transform:  translateX(24vw) translateY(100px) rotate(10deg) scale(0.5)}
+    0% { opacity: 0.3; transform: translate(-220%, -120%) rotate(-7deg) scale(0.1)}
+    100% { opacity: 0.4; transform: translate(0, 0) rotate(10deg) scale(0.5)}
 }
 
 @keyframes floatY-1 {
@@ -680,10 +1170,11 @@ body{
 
 #ship-wrapper0 {
     position: absolute;
-    top: 10%;
-    left: -600px;
+    top: 41%;
+    left: 21%;
     z-index: 10;
     pointer-events: none; /* ignora completamente il mouse */
+    transform: translate(-230%, -120%) rotate(-10deg) scale(0.1);
 }
 
 #ship-wrapper0.visible{
@@ -692,17 +1183,19 @@ body{
 
 #spaceship0 {
     position: absolute;
-    width: 150px;
+    width: var(--ship-size);
     pointer-events: none;
+    opacity: 0;
 }
 
 #spaceship0.visible{
+    opacity: 1;
     animation: floatY0 4s ease-in-out infinite;
 }
 
 @keyframes fly0 {
-    0% { opacity: 0.3; transform:  translateX(0) translateY(0px) rotate(-10deg) scale(0.1)}
-    100% { opacity: 0.7; transform:  translateX(37vw) translateY(150px) rotate(15deg) scale(0.8)}
+    0% { opacity: 0.3; transform: translate(-230%, -120%) rotate(-10deg) scale(0.1)}
+    100% { opacity: 0.7; transform: translate(0, 0) rotate(15deg) scale(0.8)}
 }
 
 @keyframes floatY0 {
@@ -712,11 +1205,12 @@ body{
 }
 
 #ship-wrapper {
-    position: fixed;
-    top: 40%;
-    left: -600px;
+    position: absolute;
+    top: 60%;
+    left: 38%;
     z-index: 10;
     pointer-events: none;
+    transform: translate(-230%, 60%) rotate(15deg) scale(0.1);
 }
 
 #ship-wrapper.visible{
@@ -725,17 +1219,19 @@ body{
 
 #spaceship {
     position: relative;
-    width: 150px;
+    width: var(--ship-size);
     pointer-events: none;
+    opacity: 0;
 }
 
 #spaceship.visible{
+    opacity: 1;
     animation: floatY 4s ease-in-out infinite;
 }
 
 @keyframes fly {
-    0% { opacity: 0.3; transform: translateX(0) translateY(-20px) rotate(15deg) scale(0.1)}
-    100% { opacity: 1; transform: translateX(67vw) translateY(20px) rotate(-15deg) scale(1)}
+    0% { opacity: 0.3; transform: translate(-230%, 60%) rotate(15deg) scale(0.1)}
+    100% { opacity: 1; transform: translate(0, 0) rotate(-15deg) scale(1)}
 }
 
 @keyframes floatY {
@@ -745,11 +1241,12 @@ body{
 }
 
 #ship-wrapper2 {
-    position: fixed;
-    top: 20%;
-    left: 90vw; 
+    position: absolute;
+    top: 18%;
+    right: 38%; 
     z-index: 10;
     pointer-events: none;
+    transform: translate(230%, -90%) rotate(10deg) scale(0.1);
 }
 
 #ship-wrapper2.visible{
@@ -757,17 +1254,19 @@ body{
 }
 
 #spaceship2 {
-    width: 150px;
+    width: var(--ship-size);
     pointer-events: none;
+    opacity: 0;
 }
 
 #spaceship2.visible{
+    opacity: 1;
     animation: floatY2 4s ease-in-out infinite;
 }
 
 @keyframes fly2 {
-    0% { opacity: 0.3; transform: translateX(0vw) translateY(10px) rotate(10deg) scale(0.1)}
-    100% { opacity: 1; transform: translateX(-75vw) translateY(-10px) rotate(-7deg) scale(1)}
+    0% { opacity: 0.3; transform: translate(230%, -90%) rotate(10deg) scale(0.1)}
+    100% { opacity: 1; transform: translate(0, 0) rotate(-7deg) scale(1)}
 }
 
 @keyframes floatY2 {
@@ -777,11 +1276,12 @@ body{
 }
 
 #ship-wrapper1 {
-    position: fixed;
-    top: 20%;
-    left: 90vw; 
+    position: absolute;
+    top: 45%;
+    right: 20%; 
     z-index: 10;
     pointer-events: none;
+    transform: translate(220%, 20%) rotate(8deg) scale(0.1);
 }
 
 #ship-wrapper1.visible{
@@ -789,17 +1289,19 @@ body{
 }
 
 #spaceship1 {
-    width: 150px;
+    width: var(--ship-size);
     pointer-events: none;
+    opacity: 0;
 }
 
 #spaceship1.visible{
+    opacity: 1;
     animation: floatY1 3s ease-in-out infinite;
 }
 
 @keyframes fly1 {
-    0% { opacity: 0.3; transform:  translateX(0vw) translateY(0px) rotate(8deg) scale(0.1)}
-    100% { opacity: 0.7; transform:  translateX(-45vw) translateY(80px) rotate(-9deg) scale(0.8)}
+    0% { opacity: 0.3; transform: translate(220%, 20%) rotate(8deg) scale(0.1)}
+    100% { opacity: 0.7; transform: translate(0, 0) rotate(-9deg) scale(0.8)}
 }
 
 @keyframes floatY1 {
@@ -809,11 +1311,12 @@ body{
 }
 
 #ship-wrapper3 {
-    position: fixed;
-    top: 20%;
-    left: 90vw;
+    position: absolute;
+    top: 43%;
+    right: 4%;
     z-index: 10;
     pointer-events: none;
+    transform: translate(210%, 10%) rotate(10deg) scale(0.1);
 }
 
 #ship-wrapper3.visible{
@@ -821,17 +1324,19 @@ body{
 }
 
 #spaceship3 {
-    width: 150px;
+    width: var(--ship-size);
     pointer-events: none;
+    opacity: 0;
 }
 
 #spaceship3.visible{
+    opacity: 1;
     animation: floatY3 4s ease-in-out infinite;
 }
 
 @keyframes fly3 {
-    0% { opacity: 0.3; transform:  translateX(0vw) translateY(-10px) rotate(10deg) scale(0.1)}
-    100% { opacity: 0.4; transform:  translateX(-30vw) translateY(85px) rotate(-7deg) scale(0.5)}
+    0% { opacity: 0.3; transform: translate(210%, 10%) rotate(10deg) scale(0.1)}
+    100% { opacity: 0.4; transform: translate(0, 0) rotate(-7deg) scale(0.5)}
 }
 
 @keyframes floatY3 {
@@ -840,16 +1345,73 @@ body{
     100% { transform: translateY(0); }
 }
 
-
 #div-img-planet{
-    background: linear-gradient(90deg, transparent, #2B2F77, transparent);
-    width: 600px;
-    height: 500px;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 6 / 2; /* proporzioni div */
+    height: auto;
     display: flex;
     justify-content: center;
     align-items: center;
     margin: auto;
-    border-radius: 100px
+    background: linear-gradient(transparent, rgba(25, 35, 60, 0.85), rgba(8, 15, 30, 0.95), rgba(25, 35, 60, 0.85), transparent);
+}
+
+@media (max-width: 700px) {
+    .ship-wrappers{
+        --ship-size: clamp(40px, 10vw, 78px);
+    }
+
+    #div-img-offer{
+        gap: clamp(2px, 0.8vw, 8px);
+        padding-inline: 4px;
+    }
+
+    #img-offer2{
+        width: clamp(110px, 30vw, 220px);
+    }
+
+    .img-offer1-3{
+        width: clamp(68px, 17vw, 135px);
+    }
+
+    .img-offer0-4{
+        width: clamp(34px, 9vw, 64px);
+    }
+
+    .planet-wrapper::after {
+        font-size: 12px;
+    }
+
+    #ship-wrapper-1 {
+        top: 46%;
+        left: 3%;
+    }
+
+    #ship-wrapper0 {
+        top: 41%;
+        left: 18%;
+    }
+
+    #ship-wrapper2 {
+        top: 18%;
+        right: 34%;
+    }
+
+    #ship-wrapper {
+        top: 60%;
+        left: 38%;
+    }
+
+    #ship-wrapper1 {
+        top: 45%;
+        right: 17%;
+    }
+
+    #ship-wrapper3 {
+        top: 43%;
+        right: 1%;
+    }
 }
 
 
@@ -1220,14 +1782,31 @@ body{
     display: flex;
     flex-direction: row;
     scroll-behavior: smooth;
-    scroll-snap-type: x mandatory;
+    /* forza l'aggancio orizzontale dello scroll ai punti di snap degli elementi figli */
+    scroll-snap-type: x mandatory; /* quindi crea l'effetto di inquadramento obbligatorio di una slide nella porzione visibile dello slider */
     overflow-x: auto;      /* abilita scroll orizzontale */
     overflow-y: hidden;
-    scroll-behavior: smooth;
     width: 70%;
     padding: 40px 0;
     height: auto;
     cursor: grab;          /* effetto visivo */
+    /*
+       mask-image applica una maschera di visibilita all'elemento.
+       Qui usiamo un gradiente orizzontale per far svanire il contenuto ai bordi.
+
+       Regola della maschera:
+       - transparent = zona nascosta o quasi invisibile
+       - black = zona completamente visibile
+
+       Quindi, da sinistra a destra:
+       - transparent: il bordo sinistro parte sfumato
+       - black 15%: da circa il 15% in poi il contenuto e pienamente visibile
+       - black 85%: resta pienamente visibile fino a circa l'85%
+       - transparent: il bordo destro torna a sfumare
+
+       Risultato visivo: lo slider si vede bene al centro, mentre gli elementi
+       che entrano o escono ai lati sembrano dissolversi gradualmente.
+    */
     mask-image: linear-gradient(
         to right,
         transparent,

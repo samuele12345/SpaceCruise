@@ -1,0 +1,24 @@
+{
+  "name": "spacecruise",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Promotional multi-page space travel website with Express and PostgreSQL example backend.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "spacecruise",
+    "html",
+    "css",
+    "javascript",
+    "express",
+    "postgresql"
+  ],
+  "author": "Riva Samuele",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}
