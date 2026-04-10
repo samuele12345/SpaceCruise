@@ -43,6 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const detailsLink = document.querySelectorAll("#nav-div details");
 
+  const body = document.querySelector("body");
+
   // 5 slot immagine del carosello offerte pianeti.
   const imgPlanet0 = document.querySelector("#img-offer0");
   const imgPlanet1 = document.querySelector("#img-offer1");
@@ -89,7 +91,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let isOpened = [false, false, false];
 
-  
+  const s_components = document.querySelector(".div-s");
+  const movement = 5;
+  let x = 0;
+  let y = 0;
+
+  const pressedKey = {
+    ArrowUp: false,
+    ArrowDown: false,
+    ArrowLeft: false,
+    ArrowRight: false,
+  }
+
+  const contShip = document.querySelector("#main-img-navicella");
+  const butShip = document.querySelector("#but-sh");
+  let isClicked = false;
+  let shipAnimationId = null;
 
   // On-load: rende subito visibili le card2 (con lieve delay per evitare glitch iniziale).
   window.addEventListener("load", () => {
@@ -652,7 +669,255 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
   });
+  // ===============================
+  //  CONTROLLO NAVICELLA
+  // ===============================
+  // Questa sezione gestisce l'intero "mini-gioco" della navicella.
+  // L'idea di base resta la tua:
+  // - un bottone Start!/Stop! attiva o disattiva il controllo,
+  // - le frecce impostano una direzione di movimento,
+  // - requestAnimationFrame aggiorna la posizione a ogni frame.
+  //
+  // separate in modo esplicito:
+  // 1) le funzioni di utilita,
+  // 2) lo stato attivo/inattivo del controllo,
+  // 3) lo stato visuale del bottone in base allo scroll,
+  // 4) il loop di animazione.
+  //
+  // Questa separazione evita il problema del vecchio `if(isClicked)`:
+  // quel controllo veniva valutato una sola volta al caricamento,
+  // mentre ora il toggle avviene davvero quando l'utente clicca il bottone.
 
+  if (butShip && contShip && s_components) {
+    // Calcola la distanza massima disponibile per la navicella
+    // all'interno del suo contenitore.
+    //
+    // Qui usiamo meta dello spazio residuo, non lo spazio intero:
+    // la navicella parte centrata e puo muoversi in modo simmetrico
+    // verso sinistra/destra e alto/basso senza uscire dal box.
+    function getDist(){
+      const maxX = Math.max((contShip.clientWidth - s_components.offsetWidth) / 2, 0);
+      const maxY = Math.max((contShip.clientHeight - s_components.offsetHeight) / 2, 0);
 
+      // Restituiamo un oggetto con entrambi i limiti,
+      // cosi updateMove puo destrutturarli con comodita.
+      return {maxX, maxY};
+    }
+
+    // Riporta tutti i tasti freccia a false.
+    // Serve soprattutto quando si esce dalla modalita controllo,
+    // per evitare che una direzione resti memorizzata come premuta.
+    function resetPressedKeys() {
+      Object.keys(pressedKey).forEach(key => {
+        // key assume a turno i valori ArrowUp, ArrowDown, ArrowLeft, ArrowRight.
+        pressedKey[key] = false;
+      });
+    }
+
+    // Il bottone deve essere usabile solo quando la pagina e ancora in alto.
+    // Appena l'utente inizia a scrollare, lo disabilitiamo visivamente e funzionalmente.
+    function updateShipButtonState() {
+      // window.scrollY === 0 significa: la pagina e esattamente in cima.
+      const isAtTop = window.scrollY === 0;
+      // Disabilitiamo il bottone solo se l'utente ha scrollato
+      // e non e gia dentro la modalita controllo.
+      const shouldDisable = !isAtTop && !isClicked;
+
+      // disabled blocca il click a livello HTML.
+      butShip.disabled = shouldDisable;
+      // toggle aggiunge o rimuove la classe CSS in base al booleano:
+      // - true  => aggiunge "ship-button-disabled"
+      // - false => la rimuove
+      butShip.classList.toggle("ship-button-disabled", shouldDisable);
+    }
+
+    // Quando la modalita controllo e attiva blocchiamo lo scroll verticale
+    // per evitare che le frecce facciano scorrere la pagina invece di guidare la navicella.
+    function lockPageScroll() {
+      // Nasconde lo scroll verticale del body.
+      body.style.overflowY = "hidden";
+      // Forza il body ad avere altezza pari alla viewport.
+      // Insieme a overflow hidden rende il blocco piu evidente/stabile.
+      body.style.height = "100vh";
+    }
+
+    // Ripristina il comportamento normale della pagina
+    // quando la modalita controllo viene disattivata.
+    function unlockPageScroll() {
+      // Stringa vuota = rimuovi lo stile inline e torna al CSS base.
+      body.style.overflowY = "";
+      body.style.height = "";
+    }
+
+    // Spegne la modalita controllo navicella.
+    // Qui riportiamo tutto a uno stato coerente di "stop".
+    function stopShipControl() {
+      // Lo stato principale del toggle torna a false.
+      isClicked = false;
+      // L'etichetta del bottone torna a invitare l'avvio del controllo.
+      butShip.textContent = "Start!";
+      // Nessuna freccia deve restare segnata come premuta.
+      resetPressedKeys();
+      // La pagina torna scrollabile.
+      unlockPageScroll();
+
+      // Se era gia stato richiesto un frame successivo,
+      // lo annulliamo esplicitamente.
+      if (shipAnimationId !== null) {
+        cancelAnimationFrame(shipAnimationId);
+        // null significa: nessun loop attivo in questo momento.
+        shipAnimationId = null;
+      }
+
+      // Ricalcoliamo lo stato del bottone in base alla posizione di scroll corrente.
+      updateShipButtonState();
+    }
+
+    // Questa funzione e il cuore del movimento continuo.
+    // Viene richiamata una prima volta da startShipControl()
+    // e poi si auto-richiama frame dopo frame tramite requestAnimationFrame.
+    function updateMove(){
+      // Se la modalita controllo e stata spenta, interrompiamo il loop al frame corrente.
+      if (!isClicked) {
+        shipAnimationId = null;
+        return;
+      }
+
+      // Recuperiamo i limiti massimi aggiornati del contenitore.
+      const {maxX, maxY} = getDist();
+
+      // Se ArrowUp e premuto, aumentiamo y.
+      // Math.min impedisce di superare il bordo alto consentito.
+      if(pressedKey.ArrowUp){
+        y = Math.min(y + movement, maxY);
+      }
+
+      // Se ArrowDown e premuto, diminuiamo y.
+      // Math.max impedisce di andare oltre il bordo basso consentito.
+      if(pressedKey.ArrowDown){
+        y = Math.max(y - movement, -maxY);
+      }
+
+      // Se ArrowRight e premuto, aumentiamo x.
+      // Il valore non puo superare il limite destro.
+      if(pressedKey.ArrowRight){
+        x = Math.min(x + movement + 2 , maxX);
+      }
+
+      // Se ArrowLeft e premuto, diminuiamo x.
+      // Il valore non puo scendere oltre il limite sinistro.
+      if(pressedKey.ArrowLeft){
+        x = Math.max(x - movement, -maxX);
+      }
+
+      // La classe `break` non va alternata a ogni frame con toggle,
+      // altrimenti l'animazione CSS continua a riavviarsi e sembra non partire.
+      // Qui la teniamo attiva finche la navicella sta virando in orizzontale.
+      if (pressedKey.ArrowLeft && !pressedKey.ArrowRight) {
+        s_components.style.transform = "rotate(-5deg)";
+        s_components.classList.add("break");
+      } else if (pressedKey.ArrowRight && !pressedKey.ArrowLeft) {
+        s_components.style.transform = "rotate(5deg)";
+        s_components.classList.remove("break");
+      } else {
+        s_components.style.transform = "rotate(0deg)";
+        s_components.classList.remove("break");
+      }
+
+      // La navicella parte dal centro del contenitore.
+      // Spostiamo quindi il suo angolo in alto a sinistra sommando:
+      // - la posizione iniziale centrata
+      // - l'offset orizzontale x
+      // - l'offset verticale y, invertito su top perche y positivo significa "salire".
+      const startLeft = (contShip.clientWidth - s_components.offsetWidth) / 2;
+      const startTop = (contShip.clientHeight - s_components.offsetHeight) / 2;
+
+      s_components.style.left = `${startLeft + x}px`;
+      s_components.style.top = `${startTop - y}px`;
+
+      // Pianifichiamo il prossimo aggiornamento al frame successivo.
+      // Il browser restituisce un id numerico che salviamo in shipAnimationId
+      // per poter eventualmente annullare il loop con cancelAnimationFrame.
+      shipAnimationId = requestAnimationFrame(updateMove);
+    }
+
+    // Accende la modalita controllo navicella.
+    function startShipControl() {
+      // Stato attivo del toggle.
+      isClicked = true;
+      // Il bottone ora diventa il comando di stop.
+      butShip.textContent = "Stop!";
+      // Blocchiamo lo scroll della pagina mentre si guida la navicella.
+      lockPageScroll();
+      // Aggiorniamo immediatamente lo stato visuale/funzionale del bottone.
+      updateShipButtonState();
+
+      // Avviamo il loop solo se non e gia in esecuzione, evitando doppi requestAnimationFrame.
+      if (shipAnimationId === null) {
+        // Riallineiamo la navicella al centro al momento dell'avvio,
+        // cosi i limiti vengono sempre calcolati da una base coerente.
+        const startLeft = (contShip.clientWidth - s_components.offsetWidth) / 2;
+        const startTop = (contShip.clientHeight - s_components.offsetHeight) / 2;
+
+        s_components.style.left = `${startLeft + x}px`;
+        s_components.style.top = `${startTop - y}px`;
+        updateMove();
+      }
+    }
+
+    butShip.addEventListener("click", () => {
+      // Se il bottone e disabilitato perche la pagina non e piu in cima,
+      // ignoriamo il click.
+      if (butShip.disabled) {
+        return;
+      }
+
+      // Toggle esplicito:
+      // - se il controllo e attivo => stop
+      // - se il controllo e spento => start
+      if (isClicked) {
+        stopShipControl();
+      } else {
+        startShipControl();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      // Se il tasto non e una freccia, oppure la modalita controllo non e attiva,
+      // non dobbiamo fare nulla.
+      if(!Object.hasOwn(pressedKey, event.key) || !isClicked){
+        return;
+      }
+
+      // Blocca il comportamento standard del browser sulle frecce.
+      event.preventDefault();
+      // Memorizza la freccia come premuta.
+      // updateMove leggera questo stato al frame successivo.
+      pressedKey[event.key] = true;
+    });
+
+    document.addEventListener("keyup", event => {
+      // Stesso filtro del keydown: reagiamo solo alle frecce
+      // e solo quando la modalita navicella e attiva.
+      if(!Object.hasOwn(pressedKey, event.key) || !isClicked){
+        return;
+      }
+
+      s_components.style.transform = "rotate(0deg)";
+      s_components.classList.remove("break");
+      event.preventDefault();
+      // Quando il tasto viene rilasciato, il movimento in quella direzione si ferma.
+      pressedKey[event.key] = false;
+    });
+
+    // Lo stato del bottone dipende dalla posizione di scroll corrente:
+    // a top: 0 e attivo, appena si scende viene spento finche non si torna in cima.
+    window.addEventListener("scroll", updateShipButtonState, { passive: true });
+    window.addEventListener("load", updateShipButtonState);
+    updateShipButtonState();
+  }
+  
+
+  
  
 });
