@@ -1,23 +1,19 @@
-// Tutto il codice viene inizializzato solo quando il DOM e pronto.
-// In questo modo evitiamo errori su elementi non ancora presenti in pagina.
+// Inizializzazione dopo DOMContentLoaded.
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Collezione delle card animate quando entrano in viewport.
+  // Card animate in viewport.
   const cards = document.querySelectorAll(".scroll-card");
 
-  // ---- example database call ----
-  // Esempio di caricamento dati dal backend: recupera i voli e li stampa nel <main>.
-  // E una demo rapida, utile per verificare che API e frontend comunichino correttamente.
+  // Demo chiamata API voli.
   async function loadFlights() {
     try {
       const res = await fetch('/api/flights');
       if (!res.ok) throw new Error('Network response was not ok');
-      // Conversione della risposta in JSON.
       const flights = await res.json();
       const main = document.querySelector('main');
       flights.forEach(f => {
         const div = document.createElement('div');
-        // adjust field names to whatever your table has
+        // Adattare i campi al formato della tabella.
         div.textContent = `${f.id || ''} ${f.origin || ''} → ${f.destination || ''}`;
         main.appendChild(div);
       });
@@ -29,11 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   
 
-  // ---- end example database call ----
-
-
-  // Link di navigazione e relativi <details> del menu mobile.
-  // Alla pressione di un link, i <details> vengono richiusi.
+  // Chiusura dei details di navigazione al click sui link.
   const navLinks = document.querySelectorAll("#nav-div a");
   const navLinksAfter = document.querySelectorAll("#nav-div a::after");
   const dropDs = document.querySelectorAll(".drop");
@@ -45,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const body = document.querySelector("body");
 
-  // 5 slot immagine del carosello offerte pianeti.
+  // Slot immagini del carosello offerte.
   const imgPlanet0 = document.querySelector("#img-offer0");
   const imgPlanet1 = document.querySelector("#img-offer1");
   const imgPlanet2 = document.querySelector("#img-offer2");
@@ -55,27 +47,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const curT = document.querySelector(".hero-curved-title");
   
 
-  // Area testuale collegata al pianeta centrale (titolo + descrizione).
+  // Testo associato al pianeta centrale.
   const descPlanet = document.querySelector("#desc-offer");
   const descTit = document.querySelector("#desc-tit");
   const randomOffer = document.querySelector(".random-offer");
 
-  // Bottone che riavvia l'animazione delle astronavi.
+  // Riavvio animazione astronavi.
   const buttonEngine = document.querySelector("#accensione");
   const sp_ship = document.querySelectorAll(".spaceship-button");
 
-  // Nodo selezionato ma non usato nel file: utile se vorrai agganciare effetti futuri.
+  // Nodo riservato per estensioni future.
   const engine = document.querySelectorAll(".intro-par-div-lat");
 
   
   const mainImgCl = document.querySelector(".main-img-div img");
+  const imgPoint = document.querySelector(".tit-point");
 
-  // Sezione che fa da trigger per animazioni delle wrappers astronavi.
+  // Trigger viewport per animazioni wrappers astronavi.
   const section = document.querySelector(".random-offer");
   const planetVisualSection = document.querySelector("#div-img-planet");
   const shipWrappers = document.querySelectorAll(".ship-wrappers");
 
-  // Selezioniamo il contenitore principale dello slider
+  // Contenitore principale slider.
   const slider = document.getElementById("scroll-moon");
 
   const cards2 = document.querySelectorAll(".scroll-card2");
@@ -86,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const divImg = document.querySelectorAll(".div-un-img");
 
-  // Flag anti-jank: limita gli aggiornamenti dello scroll a un frame per volta.
+  // Flag anti-jank per aggiornamenti frame-based.
   let ticking = false;
 
   let isOpened = [false, false, false];
@@ -108,69 +101,65 @@ document.addEventListener("DOMContentLoaded", () => {
   let isClicked = false;
   let shipAnimationId = null;
 
-  // On-load: rende subito visibili le card2 (con lieve delay per evitare glitch iniziale).
+  // Render iniziale card2 con piccolo delay.
   window.addEventListener("load", () => {
     cards2.forEach(card => {
       setTimeout(() => {
         card.classList.add("visible");
-      }, 50); // 50ms di ritardo evita offset iniziale
+      }, 50); // Delay anti-glitch.
     });
   });
+
+  window.addEventListener("load", () =>{
+    mainImgCl.classList.add("img-ready");
+    imgPoint.classList.add("img-ready");
+    mainImgCl.classList.add("loa");
+  })
 
   window.addEventListener("load", () => {
     curT.classList.add("visible");
   });
 
-  // Observer per card2: entra => mostra, esce => nasconde (animazione reversibile).
+  // Observer card2: mostra in ingresso, nasconde in uscita.
   if (cards2.length > 0) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            // Quando la sezione entra nello schermo → aggiungi 'visible'
             entry.target.classList.add("visible");
           } else {
-            // Quando la sezione esce dallo schermo → rimuovi 'visible'
             entry.target.classList.remove("visible");
           }
         });
       },
       {
-        threshold: 0.1 // 50% della sezione deve essere visibile per attivare
+        threshold: 0.1 // Soglia di attivazione.
       }
     );
-
-    // Osserva tutte le sezioni selezionate
     cards2.forEach(card => observer.observe(card));
   }
 
-  // Observer per mascot/card3: stessa logica di cards2 ma threshold piu alto
-  // per attivare l'effetto solo quando la card e quasi completamente visibile.
+  // Observer card3: stessa logica con soglia piu alta.
   if (cards3.length > 0) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            // Quando la sezione entra nello schermo → aggiungi 'visible'
             entry.target.classList.add("visible");
           } else {
-            // Quando la sezione esce dallo schermo → rimuovi 'visible'
             entry.target.classList.remove("visible");
           }
         });
       },
       {
-        threshold: 0.9 // 90% della sezione deve essere visibile per attivare
+        threshold: 0.9 // Soglia di attivazione.
       }
     );
-
-    // Osserva tutte le sezioni selezionate
     cards3.forEach(card => observer.observe(card));
   }
 
 
-  // "Mini database" locale per i pianeti del modulo random-offer.
-  // Ogni record contiene: percorso immagine, titolo e descrizione marketing.
+  // Dataset locale pianeti per sezione random-offer.
   const placesImg = [
     {img: `img/mars.png`, tit: "Mars", desc: "Tired of ordinary landscapes? Try the Red Planet! Marvel at heroic canyons, take a rover ride across history itself, and toast the sunset under skies painted in bold Martian hues. Mars: rugged, radiant, and remarkably relaxing!"}, 
     {img: `img/moon.png`, tit: "Moon", desc: "Why settle for a backyard picnic when you can vacation on the Moon? Enjoy delightful low-gravity strolls, dazzling Earthrise views, and lunar cocktails served with a cosmic twist. It’s the classic getaway — now 384,000 kilometers better!"},
@@ -187,30 +176,25 @@ document.addEventListener("DOMContentLoaded", () => {
     {img: `img/neptuneSoil.png`}
   ]
 
-  // Observer delle card principali: animazione one-shot.
-  // Quando una card e visibile, aggiungiamo "visible" e poi smettiamo di osservarla.
+  // Observer card principali: animazione one-shot.
   if (cards.length > 0) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            // Quando la sezione entra nello schermo → aggiungi 'visible'
             entry.target.classList.add("visible");
-            // Smette di osservare dopo la prima attivazione
             observer.unobserve(entry.target);
           } 
         });
       },
       {
-        threshold: 0.2 // 20% della sezione deve essere visibile per attivare
+        threshold: 0.2 // Soglia di attivazione.
       }
     );
-
-    // Osserva tutte le sezioni selezionate
     cards.forEach(card => observer.observe(card));
   }
 
-  // Chiusura menu details al click su qualsiasi link nav.
+  // Chiusura details menu al click sui link nav.
   navLinks.forEach(link => {
     link.addEventListener("click", () => {
       detailsLink.forEach(detail =>{
@@ -221,14 +205,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   
 
-  // Attiva la classe di accensione motore sugli elementi laterali al caricamento pagina.
+  // Attivazione classe motore al caricamento.
   window.addEventListener("load", () => {
       document.querySelectorAll(".main-img-div-lat")
           .forEach(div => div.classList.add("engine-on"));
   });
 
-  // Blocco centrale: inizializza offerte pianeti solo quando la sezione entra in viewport.
-  // Questo evita lavoro inutile prima che l'utente raggiunga la sezione.
+  // Inizializzazione offerte solo in viewport.
   if (randomOffer){
     const observer = new IntersectionObserver((entries, observer) => {
 
@@ -236,8 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (entry.isIntersecting) {
 
-          // 5 indici distinti per popolare i 5 slot del carosello.
-          // L'uso dei do...while garantisce l'assenza di duplicati iniziali.
+          // Estrazione 5 indici distinti per gli slot.
 
           let randomIndex0 = 0;
           let randomIndex1 = Math.floor(Math.random() * placesImg.length);;
@@ -261,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
             randomIndex4 = Math.floor(Math.random() * placesImg.length);
           }while(randomIndex4 === randomIndex1 || randomIndex4 === randomIndex2 || randomIndex4 === randomIndex3 || randomIndex4 === randomIndex0);
 
-          // Il pianeta al centro e quello "attivo": titolo/descrizione dipendono da lui.
+          // Pianeta centrale usato per titolo e descrizione.
           descTit.textContent = placesImg[randomIndex2].tit;
 
           imgPlanet0.src = placesImg[randomIndex0].img;
@@ -282,30 +264,25 @@ document.addEventListener("DOMContentLoaded", () => {
           descPlanet.textContent = placesImg[randomIndex2].desc;
           
 
-          // One-shot: inizializziamo una sola volta quando la sezione appare la prima volta.
           observer.unobserve(entry.target);
 
-          // Stato corrente del carosello (sinistra estrema, sinistra, centro, destra, destra estrema).
+          // Stato corrente carosello.
           let dueLeftIndex = randomIndex0;
           let leftIndex = randomIndex1;
           let centerIndex = randomIndex2;
           let rightIndex = randomIndex3;
           let dueRightIndex = randomIndex4;
 
-          // Click sullo slot di sinistra: quel pianeta diventa il nuovo centro.
+          // Click slot sinistro: promozione a centro.
           imgPlanet1.addEventListener("click", () => {
-
-            // Il sinistro diventa il centro
             centerIndex = leftIndex;
-
-            // Aggiorno centro
             imgPlanet2.src = placesImg[centerIndex].img;
             imgPlanet2.parentElement.dataset.name = placesImg[centerIndex].tit;
 
             descTit.textContent = placesImg[centerIndex].tit;
             descPlanet.textContent = placesImg[centerIndex].desc;
 
-            // Rigeneriamo lo slot cliccato con un pianeta diverso da quelli gia visibili.
+            // Rigenerazione slot con vincolo no duplicati.
             let newIndex;
 
             do {
@@ -318,20 +295,16 @@ document.addEventListener("DOMContentLoaded", () => {
             imgPlanet1.parentElement.dataset.name = placesImg[leftIndex].tit;
           });
 
-          // Click sullo slot di destra: stessa logica speculare.
+          // Click slot destro: logica speculare.
           imgPlanet3.addEventListener("click", () => {
-
-            // Il sinistro diventa il centro
             centerIndex = rightIndex;
-
-            // Aggiorno centro
             imgPlanet2.src = placesImg[centerIndex].img;
             imgPlanet2.parentElement.dataset.name = placesImg[centerIndex].tit;
 
             descTit.textContent = placesImg[centerIndex].tit;
             descPlanet.textContent = placesImg[centerIndex].desc;
 
-            // Rigeneriamo lo slot cliccato evitando duplicati con gli altri quattro slot.
+            // Rigenerazione slot con vincolo no duplicati.
             let newIndex;
 
             do {
@@ -344,20 +317,16 @@ document.addEventListener("DOMContentLoaded", () => {
             imgPlanet3.parentElement.dataset.name = placesImg[rightIndex].tit;
           });
 
-          // Click sulla sinistra estrema: promozione a centro + rigenerazione slot estremo.
+          // Click sinistra estrema: promozione a centro.
           imgPlanet0.addEventListener("click", () => {
-
-            // Il sinistro diventa il centro
             centerIndex = dueLeftIndex;
-
-            // Aggiorno centro
             imgPlanet2.src = placesImg[centerIndex].img;
             imgPlanet2.parentElement.dataset.name = placesImg[centerIndex].tit;
 
             descTit.textContent = placesImg[centerIndex].tit;
             descPlanet.textContent = placesImg[centerIndex].desc;
 
-            // Rigenerazione con controllo anti-duplicato rispetto agli slot correnti.
+            // Rigenerazione slot con vincolo no duplicati.
             let newIndex;
 
             do {
@@ -370,20 +339,16 @@ document.addEventListener("DOMContentLoaded", () => {
             imgPlanet0.parentElement.dataset.name = placesImg[dueLeftIndex].tit;
           });
 
-          // Click sulla destra estrema: promozione a centro + rigenerazione slot estremo.
+          // Click destra estrema: promozione a centro.
           imgPlanet4.addEventListener("click", () => {
-
-            // Il sinistro diventa il centro
             centerIndex = dueRightIndex;
-
-            // Aggiorno centro
             imgPlanet2.src = placesImg[centerIndex].img;
             imgPlanet2.parentElement.dataset.name = placesImg[centerIndex].tit;
 
             descTit.textContent = placesImg[centerIndex].tit;
             descPlanet.textContent = placesImg[centerIndex].desc;
 
-            // Rigenerazione con controllo anti-duplicato rispetto agli slot correnti.
+            // Rigenerazione slot con vincolo no duplicati.
             let newIndex;
 
             do {
@@ -405,22 +370,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   }
 
-  // Riavvia l'animazione delle astronavi:
-  // 1) rimuove classe, 2) forza reflow, 3) riaggiunge classe.
+  // Riavvio animazione astronavi via reflow.
   if (buttonEngine) {
     buttonEngine.addEventListener("click", () => {
       if (sp_ship.length > 0) {
       sp_ship.forEach(ship => {
         ship.classList.remove("visible");
-        void ship.offsetWidth; // forza reflow per riavviare animazione
+        void ship.offsetWidth; // Reflow.
         ship.classList.add("visible");
       });
       }
     });
   }
 
-  // Observer della sola area visiva dei pianeti: le navicelle partono solo
-  // quando questa sezione entra davvero in viewport e non prima.
+  // Avvio navicelle solo quando la sezione pianeti entra in viewport.
   if (planetVisualSection) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -444,7 +407,7 @@ document.addEventListener("DOMContentLoaded", () => {
     observer.observe(planetVisualSection);
   }
 
-  // Effetto vibrazione logo/immagine principale al click, riavviato via reflow.
+  // Vibrazione immagine principale al click.
   if (mainImgCl) {
     mainImg.addEventListener("click", () => {
       mainImgCl.classList.remove("vibrate");
@@ -457,123 +420,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
   
 
-  // ===============================
-  //  SLIDER ORIZZONTALE (MOUSE + TOUCH)
-  // ===============================
-
-  // Variabili di stato per il drag
-  let isDown = false;     // Indica se il mouse è premuto
-  let startX;             // Posizione iniziale del mouse
-  let scrollLeft;         // Posizione iniziale dello scroll
-
-  // ===============================
-  //  CENTRATURA INIZIALE
-  // ===============================
-
-  // Ragionamento geometrico della centratura:
-  // - middleSlide.offsetLeft = punto in cui inizia la slide centrale dentro il contenuto scrollabile.
-  // - middleSlide.clientWidth / 2 = meta larghezza della slide centrale, quindi serve per passare
-  //   dal suo bordo sinistro al suo centro.
-  // - slider.clientWidth / 2 = meta della parte visibile dello slider, cioe il centro del riquadro visibile.
-  //
-  // Con le misure attuali del progetto:
-  // - ogni slide e larga 700px
-  // - il gap tra le slide e 25px
-  // - il contenitore interno ha margin-left di 60px
-  //
-  // Quindi, con 3 slide:
-  // - inizio slide centrale = 60 + 700 + 25 = 785
-  // - centro slide centrale = 785 + 350 = 1135
-  // - se la parte visibile dello slider misura 1008px, il suo centro e 504px
-  // - per centrare la slide bisogna far cadere il suo centro a 504px dal bordo sinistro visibile
-  // - quindi lo scroll da applicare e 1135 - 504 = 631
-  //
-  // In formula:
-  // scrollLeft = middleSlide.offsetLeft - (slider.clientWidth / 2) + (middleSlide.clientWidth / 2)
+  // Stato drag slider.
+  let isDown = false;
+  let startX;
+  let scrollLeft;
 
 
-  
-  // Al load centriamo automaticamente la slide di mezzo nello slider.
+  // Centra la slide centrale al load.
   if (slider) {
-    // Aspettiamo il caricamento completo della pagina prima di calcolare le misure.
     window.addEventListener("load", () => {
-
-      // Recuperiamo tutte le slide contenute nello slider.
       const slides = slider.querySelectorAll(".par-divs-x-scroll");
-      // Se non ci sono slide, usciamo subito per evitare errori.
       if (slides.length === 0) return;
-
-      // Selezioniamo la slide centrale dell'elenco.
       const middleSlide = slides[Math.floor(slides.length / 2)];
-
-      // Calcoliamo la posizione di scroll necessaria per portare al centro la slide centrale.
       const offset = middleSlide.offsetLeft 
-                     // Sottraiamo meta larghezza visibile dello slider per allineare il centro del contenitore.
                      - (slider.clientWidth / 2) 
-                     // Aggiungiamo meta larghezza della slide per allineare il suo centro.
                      + (middleSlide.clientWidth / 2);
-
-      // Applichiamo lo scroll orizzontale calcolato.
       slider.scrollLeft = offset;
     });
   }
 
-  // Aggiorna i tre riquadri immagine prendendo sempre 3 elementi consecutivi
-  // da placesSoil a partire da startIndex.
-  // Esempio:
-  // startIndex = 0 -> mostra immagini 0, 1, 2
-  // startIndex = 1 -> mostra immagini 1, 2, 3
-  // startIndex = 4 -> mostra immagini 4, 0, 1 (grazie al modulo %)
-
-  
+  // Aggiorna i 3 riquadri immagini in rotazione.
   function updateSoilBackgrounds(startIndex) {
-    // divImg e una NodeList: la convertiamo in array e prendiamo solo i primi 3 div,
-    // cioe quelli che devono mostrare gli sfondi in rotazione.
     const visibleDivs = Array.from(divImg).slice(0, 3);
 
     visibleDivs.forEach((div, offset) => {
-      // offset vale 0 per il primo div, 1 per il secondo, 2 per il terzo.
-      // Sommando startIndex + offset otteniamo i 3 elementi consecutivi da mostrare.
-      // Il modulo (%) serve a ricominciare da capo quando arriviamo in fondo all'array.
       const soil = placesSoil[(startIndex + offset) % placesSoil.length];
-
-      // Disattiviamo l'animazione CSS di base del div per evitare che sovrascriva
-      // lo sfondo impostato da JavaScript.
       div.style.animation = "none";
-
-      // Applichiamo l'immagine corrente come background del div.
-      // backgroundImage richiede la sintassi url("percorso") e non solo il path puro.
       div.style.backgroundImage = `url("${soil.img}")`;
-
-      // Rifiniamo la resa visiva dello sfondo:
-      // - center: immagine centrata
-      // - no-repeat: niente ripetizione a mosaico
-      // - cover: il div viene riempito completamente mantenendo le proporzioni
       div.style.backgroundPosition = "center";
       div.style.backgroundRepeat = "no-repeat";
       div.style.backgroundSize = "cover";
     });
   }
 
-  // Avviamo la rotazione solo se esistono almeno 3 div da riempire
-  // e almeno un'immagine disponibile nell'array.
+  // Avvia rotazione solo con dati sufficienti.
   if (divImg.length >= 3 && placesSoil.length > 0) {
     window.addEventListener("load", () => {
-      // Indice iniziale della finestra mobile sull'array placesSoil.
-      // All'inizio partiremo da 0, quindi verranno mostrate le immagini 0, 1 e 2.
       let startIndex = 0;
-
-      // Primo render immediato al caricamento pagina, senza aspettare i 3 secondi.
       updateSoilBackgrounds(startIndex);
 
       setInterval(() => {
-        // Ogni 3 secondi spostiamo in avanti di 1 il punto di partenza.
-        // Quindi la tripletta visibile scorre cosi:
-        // 0,1,2 -> 1,2,3 -> 2,3,4 -> 3,4,0 -> 4,0,1 -> ...
-        // quindi nel momento in cui si arriva a 5%5=0 lo start index viene resettato a 0
         startIndex = (startIndex + 1) % placesSoil.length;
-
-        // Ridisegniamo subito i tre div con la nuova tripletta di immagini.
         updateSoilBackgrounds(startIndex);
       }, 3000);
     });
@@ -669,150 +556,76 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
   });
-  // ===============================
-  //  CONTROLLO NAVICELLA
-  // ===============================
-  // Questa sezione gestisce l'intero "mini-gioco" della navicella.
-  // L'idea di base resta la tua:
-  // - un bottone Start!/Stop! attiva o disattiva il controllo,
-  // - le frecce impostano una direzione di movimento,
-  // - requestAnimationFrame aggiorna la posizione a ogni frame.
-  //
-  // separate in modo esplicito:
-  // 1) le funzioni di utilita,
-  // 2) lo stato attivo/inattivo del controllo,
-  // 3) lo stato visuale del bottone in base allo scroll,
-  // 4) il loop di animazione.
-  //
-  // Questa separazione evita il problema del vecchio `if(isClicked)`:
-  // quel controllo veniva valutato una sola volta al caricamento,
-  // mentre ora il toggle avviene davvero quando l'utente clicca il bottone.
+  // Controllo navicella: toggle, input tastiera e loop animazione.
 
   if (butShip && contShip && s_components) {
-    // Calcola la distanza massima disponibile per la navicella
-    // all'interno del suo contenitore.
-    //
-    // Qui usiamo meta dello spazio residuo, non lo spazio intero:
-    // la navicella parte centrata e puo muoversi in modo simmetrico
-    // verso sinistra/destra e alto/basso senza uscire dal box.
+    // Limiti di movimento nel contenitore.
     function getDist(){
       const maxX = Math.max((contShip.clientWidth - s_components.offsetWidth) / 2, 0);
       const maxY = Math.max((contShip.clientHeight - s_components.offsetHeight) / 2, 0);
-
-      // Restituiamo un oggetto con entrambi i limiti,
-      // cosi updateMove puo destrutturarli con comodita.
       return {maxX, maxY};
     }
 
-    // Riporta tutti i tasti freccia a false.
-    // Serve soprattutto quando si esce dalla modalita controllo,
-    // per evitare che una direzione resti memorizzata come premuta.
+    // Reset stato tasti freccia.
     function resetPressedKeys() {
       Object.keys(pressedKey).forEach(key => {
-        // key assume a turno i valori ArrowUp, ArrowDown, ArrowLeft, ArrowRight.
         pressedKey[key] = false;
       });
     }
 
-    // Il bottone deve essere usabile solo quando la pagina e ancora in alto.
-    // Appena l'utente inizia a scrollare, lo disabilitiamo visivamente e funzionalmente.
+    // Bottone attivo solo a pagina in alto, salvo controllo gia avviato.
     function updateShipButtonState() {
-      // window.scrollY === 0 significa: la pagina e esattamente in cima.
       const isAtTop = window.scrollY === 0;
-      // Disabilitiamo il bottone solo se l'utente ha scrollato
-      // e non e gia dentro la modalita controllo.
       const shouldDisable = !isAtTop && !isClicked;
-
-      // disabled blocca il click a livello HTML.
       butShip.disabled = shouldDisable;
-      // toggle aggiunge o rimuove la classe CSS in base al booleano:
-      // - true  => aggiunge "ship-button-disabled"
-      // - false => la rimuove
       butShip.classList.toggle("ship-button-disabled", shouldDisable);
     }
 
-    // Quando la modalita controllo e attiva blocchiamo lo scroll verticale
-    // per evitare che le frecce facciano scorrere la pagina invece di guidare la navicella.
+    // Blocco scroll durante il controllo.
     function lockPageScroll() {
-      // Nasconde lo scroll verticale del body.
       body.style.overflowY = "hidden";
-      // Forza il body ad avere altezza pari alla viewport.
-      // Insieme a overflow hidden rende il blocco piu evidente/stabile.
       body.style.height = "100vh";
     }
 
-    // Ripristina il comportamento normale della pagina
-    // quando la modalita controllo viene disattivata.
+    // Ripristino scroll pagina.
     function unlockPageScroll() {
-      // Stringa vuota = rimuovi lo stile inline e torna al CSS base.
       body.style.overflowY = "";
       body.style.height = "";
     }
 
-    // Spegne la modalita controllo navicella.
-    // Qui riportiamo tutto a uno stato coerente di "stop".
+    // Disattiva controllo navicella.
     function stopShipControl() {
-      // Lo stato principale del toggle torna a false.
       isClicked = false;
-      // L'etichetta del bottone torna a invitare l'avvio del controllo.
       butShip.textContent = "Start!";
-      // Nessuna freccia deve restare segnata come premuta.
       resetPressedKeys();
-      // La pagina torna scrollabile.
       unlockPageScroll();
-
-      // Se era gia stato richiesto un frame successivo,
-      // lo annulliamo esplicitamente.
       if (shipAnimationId !== null) {
         cancelAnimationFrame(shipAnimationId);
-        // null significa: nessun loop attivo in questo momento.
         shipAnimationId = null;
       }
-
-      // Ricalcoliamo lo stato del bottone in base alla posizione di scroll corrente.
       updateShipButtonState();
     }
 
-    // Questa funzione e il cuore del movimento continuo.
-    // Viene richiamata una prima volta da startShipControl()
-    // e poi si auto-richiama frame dopo frame tramite requestAnimationFrame.
+    // Loop movimento navicella con requestAnimationFrame.
     function updateMove(){
-      // Se la modalita controllo e stata spenta, interrompiamo il loop al frame corrente.
       if (!isClicked) {
         shipAnimationId = null;
         return;
       }
-
-      // Recuperiamo i limiti massimi aggiornati del contenitore.
       const {maxX, maxY} = getDist();
-
-      // Se ArrowUp e premuto, aumentiamo y.
-      // Math.min impedisce di superare il bordo alto consentito.
       if(pressedKey.ArrowUp){
         y = Math.min(y + movement, maxY);
       }
-
-      // Se ArrowDown e premuto, diminuiamo y.
-      // Math.max impedisce di andare oltre il bordo basso consentito.
       if(pressedKey.ArrowDown){
         y = Math.max(y - movement, -maxY);
       }
-
-      // Se ArrowRight e premuto, aumentiamo x.
-      // Il valore non puo superare il limite destro.
       if(pressedKey.ArrowRight){
         x = Math.min(x + movement + 2 , maxX);
       }
-
-      // Se ArrowLeft e premuto, diminuiamo x.
-      // Il valore non puo scendere oltre il limite sinistro.
       if(pressedKey.ArrowLeft){
         x = Math.max(x - movement, -maxX);
       }
-
-      // La classe `break` non va alternata a ogni frame con toggle,
-      // altrimenti l'animazione CSS continua a riavviarsi e sembra non partire.
-      // Qui la teniamo attiva finche la navicella sta virando in orizzontale.
+      // Stato visivo in virata orizzontale.
       if (pressedKey.ArrowLeft && !pressedKey.ArrowRight) {
         s_components.style.transform = "rotate(-5deg)";
         s_components.classList.add("break");
@@ -824,38 +637,23 @@ document.addEventListener("DOMContentLoaded", () => {
         s_components.classList.remove("break");
       }
 
-      // La navicella parte dal centro del contenitore.
-      // Spostiamo quindi il suo angolo in alto a sinistra sommando:
-      // - la posizione iniziale centrata
-      // - l'offset orizzontale x
-      // - l'offset verticale y, invertito su top perche y positivo significa "salire".
+      // Posizione calcolata dal centro + offset x/y.
       const startLeft = (contShip.clientWidth - s_components.offsetWidth) / 2;
       const startTop = (contShip.clientHeight - s_components.offsetHeight) / 2;
 
       s_components.style.left = `${startLeft + x}px`;
       s_components.style.top = `${startTop - y}px`;
 
-      // Pianifichiamo il prossimo aggiornamento al frame successivo.
-      // Il browser restituisce un id numerico che salviamo in shipAnimationId
-      // per poter eventualmente annullare il loop con cancelAnimationFrame.
       shipAnimationId = requestAnimationFrame(updateMove);
     }
 
-    // Accende la modalita controllo navicella.
+    // Attiva controllo navicella.
     function startShipControl() {
-      // Stato attivo del toggle.
       isClicked = true;
-      // Il bottone ora diventa il comando di stop.
       butShip.textContent = "Stop!";
-      // Blocchiamo lo scroll della pagina mentre si guida la navicella.
       lockPageScroll();
-      // Aggiorniamo immediatamente lo stato visuale/funzionale del bottone.
       updateShipButtonState();
-
-      // Avviamo il loop solo se non e gia in esecuzione, evitando doppi requestAnimationFrame.
       if (shipAnimationId === null) {
-        // Riallineiamo la navicella al centro al momento dell'avvio,
-        // cosi i limiti vengono sempre calcolati da una base coerente.
         const startLeft = (contShip.clientWidth - s_components.offsetWidth) / 2;
         const startTop = (contShip.clientHeight - s_components.offsetHeight) / 2;
 
@@ -866,15 +664,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     butShip.addEventListener("click", () => {
-      // Se il bottone e disabilitato perche la pagina non e piu in cima,
-      // ignoriamo il click.
       if (butShip.disabled) {
         return;
       }
-
-      // Toggle esplicito:
-      // - se il controllo e attivo => stop
-      // - se il controllo e spento => start
       if (isClicked) {
         stopShipControl();
       } else {
@@ -883,22 +675,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.addEventListener("keydown", event => {
-      // Se il tasto non e una freccia, oppure la modalita controllo non e attiva,
-      // non dobbiamo fare nulla.
       if(!Object.hasOwn(pressedKey, event.key) || !isClicked){
         return;
       }
-
-      // Blocca il comportamento standard del browser sulle frecce.
       event.preventDefault();
-      // Memorizza la freccia come premuta.
-      // updateMove leggera questo stato al frame successivo.
       pressedKey[event.key] = true;
     });
 
     document.addEventListener("keyup", event => {
-      // Stesso filtro del keydown: reagiamo solo alle frecce
-      // e solo quando la modalita navicella e attiva.
       if(!Object.hasOwn(pressedKey, event.key) || !isClicked){
         return;
       }
@@ -906,12 +690,10 @@ document.addEventListener("DOMContentLoaded", () => {
       s_components.style.transform = "rotate(0deg)";
       s_components.classList.remove("break");
       event.preventDefault();
-      // Quando il tasto viene rilasciato, il movimento in quella direzione si ferma.
       pressedKey[event.key] = false;
     });
 
-    // Lo stato del bottone dipende dalla posizione di scroll corrente:
-    // a top: 0 e attivo, appena si scende viene spento finche non si torna in cima.
+    // Sincronizzazione stato bottone con scroll e load.
     window.addEventListener("scroll", updateShipButtonState, { passive: true });
     window.addEventListener("load", updateShipButtonState);
     updateShipButtonState();

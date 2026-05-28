@@ -52,13 +52,6 @@
                             <ul id="link-list">
                                 <li class="link">
                                     <a href="home.html">Earth</a>
-                                        <!--
-                                        <ul class="drop-down">
-                                            <li><a href="#medio">Business</a></li>
-                                            <li><a href="#rand-off">Catalogue</a></li>
-                                        </ul>
-                                        
-                                        -->
                                     
                                     <div class="arrow-cont">
                                         <div class="arrow">
@@ -71,20 +64,6 @@
                                 <li class="link">
                                     
                                     <a href="destinations.html">Destinations</a>
-                                        
-                                    
-
-                                    <!--
-                                        <ul class="drop-down">
-                                            <li><a href="#navic-dest">Introduction</a></li>
-                                            <li><a href="#">Moon</a></li>
-                                            <li><a href="#">Mars</a></li>
-                                            <li><a href="#">Venus</a></li>
-                                            <li><a href="#">Uranus</a></li>
-                                            <li><a href="#">Neptune</a></li>
-                                        </ul>
-                                        
-                                        -->
                                     <div class="arrow-cont">
                                         <div class="arrow">
 
@@ -97,15 +76,6 @@
                                 <li class="link">
                                     
                                     <a href="#">Flights</a>
-                                    
-
-                                    <!--
-                                        <ul class="drop-down">
-                                            <li><a href="#">Offers</a></li>
-                                            <li><a href="#">Specials</a></li>
-                                        </ul>
-                                        
-                                        -->
                                     <div class="arrow-cont">
                                         <div class="arrow">
 
@@ -122,8 +92,7 @@
             </div>
             <div id="cont-drops">
                 <div class="drop" id="drop0">
-                    <!--mettere immagini, descrisione e link alle commponenti delle pagine-->
-                    <!--copia-incollare l'header in tutte le pagine-->
+                    <!-- TODO: contenuti menu a tendina -->
                 </div>
                 <div class="drop" id="drop1">
 
@@ -140,70 +109,20 @@
             <div id="main-div">
                 <div   id="main-div1">
                     <div class="main-img-div">
-                        <img src=".\img\Terra e razzo nello spazio.png">
-                            <!--
-                                Titolo curvo costruito con SVG.
-                                Il testo non viene deformato via CSS: segue un tracciato definito nel <path>.
-
-                                SVG = grafica vettoriale scalabile.
-                                Serve quando vuoi disegnare forme, linee o testo su percorsi precisi,
-                                senza perdere qualita' al ridimensionamento.
-                            -->
-                            <!--
-                                viewBox="0 0 900 220" definisce il sistema di coordinate interno dell'SVG.
-                                In pratica l'SVG ragiona come se avesse larghezza 900 e altezza 220,
-                                anche quando viene ridimensionato via CSS.
-                                Questo permette a path e testo di restare proporzionati.
-                            -->
+                        <img id="img-main" src=".\img\Terra e razzo nello spazio.png">
+                            <!-- Titolo curvo SVG: testo su path con coordinate stabilite dal viewBox. -->
                             <svg class="hero-curved-title" viewBox="0 0 900 220" aria-label="Welcome to SpaceCruise!" role="img">
-                                <!--
-                                    <defs> contiene definizioni "di servizio" dell'SVG.
-                                    Gli elementi qui dentro non vengono mostrati da soli sulla pagina,
-                                    ma possono essere richiamati dopo da altri elementi SVG.
-
-                                    In questo caso il path viene definito qui e poi usato da <textPath>
-                                    come guida per curvare il testo.
-                                -->
+                                <!-- Definizioni SVG riusabili (path per textPath). -->
                                 <defs>
-                                    <!--
-                                        Questo path definisce la curva guida del testo.
-
-                                        M 40 96
-                                        -> "Move to": punto iniziale del tracciato, piu' esterno a sinistra.
-
-                                        Q 450 38 860 96
-                                        -> Curva di Bezier quadratica.
-                                        -> 450 38 e' il punto di controllo: alza il centro della curva
-                                           in modo piu' evidente rispetto a prima.
-                                        -> 860 96 e' il punto finale del tracciato, piu' esterno a destra.
-
-                                        In pratica:
-                                        - 40 e 860 allungano di piu' il tracciato ai lati
-                                        - 96 e 96 tengono le estremita' alla stessa altezza
-                                        - 38 al centro crea una curvatura piu' marcata verso l'alto
-                                        - il path piu' lungo lascia spazio anche al punto esclamativo finale
-
-                                        Qui il path e' stato allungato e leggermente rialzato al centro,
-                                        perche' il titolo principale e' stato ingrandito via CSS
-                                        e l'ultimo carattere rischiava di uscire dalla parte utile della curva.
-
-                                        Se vuoi piu' curvatura:
-                                        - diminuisci 38, per esempio 28 o 22
-                                        Se vuoi meno curvatura:
-                                        - aumenta 38, per esempio 48 o 58
-                                    -->
+                                    <!-- Curva guida del titolo principale (Bezier quadratica). -->
                                     <path id="hero-title-curve" d="M 40 96 Q 450 38 860 96"></path>
                                 </defs>
-                                <!--
-                                    Il testo segue il path tramite textPath.
-                                    startOffset="50%" centra il testo lungo la curva.
-                                    text-anchor="middle" mantiene il testo bilanciato rispetto al centro.
-                                -->
+                                <!-- Testo centrato lungo la curva. -->
                                 <text>
                                     <textPath href="#hero-title-curve" startOffset="50%" text-anchor="middle">Welcome to SpaceCruise!</textPath>
                                 </text>
                             </svg>
-                        <h2>Your journey starts now<span class="punto">.</span><span class="punto">.</span><span class="punto">.</span></h2>
+                        <h2 class="tit-point">Your journey starts now<span class="punto">.</span><span class="punto">.</span><span class="punto">.</span></h2>
                     </div>
                 </div>
 
@@ -226,51 +145,14 @@
                         <p class="p-tit-un">"SpaceCruise offers reliable service, premium comfort, and a smooth travel experience."
 Source: Stellar Travel Review Institute</p>
 
-                        <!--
-                            Questo secondo SVG usa un viewBox coerente con il path.
-                            Prima il viewBox era troppo stretto rispetto alla curva,
-                            quindi il textPath risultava visivamente spostato verso destra.
-                        -->
+                        <!-- Secondo titolo curvo: viewBox allineato al path. -->
                         <svg class="hero-curved-title2" viewBox="0 0 900 140" aria-label="Book your flight now!" role="img">
-                                <!--
-                                    <defs> contiene definizioni "di servizio" dell'SVG.
-                                    Gli elementi qui dentro non vengono mostrati da soli sulla pagina,
-                                    ma possono essere richiamati dopo da altri elementi SVG.
-
-                                    In questo caso il path viene definito qui e poi usato da <textPath>
-                                    come guida per curvare il testo.
-                                -->
+                                <!-- Definizioni SVG riusabili (path per textPath). -->
                                 <defs>
-                                    <!--
-                                        Questo path definisce la curva guida del titolo centrale.
-
-                                        M 80 36
-                                        -> "Move to": punto iniziale del tracciato, a sinistra.
-
-                                        Q 450 90 820 36
-                                        -> Curva di Bezier quadratica.
-                                        -> 450 90 e' il punto di controllo: abbassa il centro della curva,
-                                           cosi' il testo forma un arco verso il basso.
-                                        -> 820 36 e' il punto finale del tracciato, a destra.
-
-                                        In pratica:
-                                        - 80 e 820 tengono il tracciato piu' raccolto rispetto al titolo principale
-                                        - 36 e 36 mantengono le estremita' alla stessa altezza
-                                        - 90 al centro crea una discesa morbida e simmetrica
-                                        - questa forma funziona bene per il titolo corto tra le due recensioni
-
-                                        Se vuoi un arco piu' profondo:
-                                        - aumenta 90, per esempio 100 o 110
-                                        Se vuoi un arco piu' leggero:
-                                        - diminuisci 90, per esempio 75 o 65
-                                    -->
+                                    <!-- Curva guida del titolo centrale (arco verso il basso). -->
                                     <path id="hero-title-curve2" d="M 80 36 Q 450 90 820 36"></path>
                                 </defs>
-                                <!--
-                                    Il testo segue il path tramite textPath.
-                                    startOffset="50%" centra il testo lungo la curva.
-                                    text-anchor="middle" mantiene il testo bilanciato rispetto al centro.
-                                -->
+                                <!-- Testo centrato lungo la curva. -->
                                 <text>
                                     <textPath href="#hero-title-curve2" startOffset="50%" text-anchor="middle">Book your flight now!</textPath>
                                 </text>
@@ -317,7 +199,7 @@ Source: International Aerospace Hospitality Board</p>
 
                     <div id="div-img-planet">
                         
-                        <!--aggiungere le navicelle per gli altri pianeti-->
+                        <!-- TODO: navicelle dedicate per ogni pianeta -->
 
                         <div id="ship-wrapper-1" class="ship-wrappers">
                             <img src="img\spaceship.png" id="spaceship-1" class="spaceships">

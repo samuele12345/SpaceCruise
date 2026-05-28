@@ -1,8 +1,4 @@
-// Simple Express server connecting to PostgreSQL via node-postgres (pg)
-// To use this:
-//   1. install dependencies: `npm install express pg`
-//   2. ensure PostgreSQL is running and you have created a database/table via pgAdmin
-//   3. run `node server.js` (or use nodemon for auto-reload)
+// Server Express con connessione PostgreSQL (pg).
 
 const express = require('express');
 const { Pool } = require('pg');
@@ -11,19 +7,19 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// configure static files so you can serve your HTML/CSS/JS
+// File statici frontend.
 app.use(express.static(path.join(__dirname)));
 
-// create a connection pool - update with your pgAdmin credentials
+// Pool PostgreSQL (configurare credenziali locali).
 const pool = new Pool({
-  user: 'postgres',        // pgAdmin username
-  host: 'localhost',       // your database host
-  database: 'spacecruise', // the database you created
+  user: 'postgres',
+  host: 'localhost',
+  database: 'spacecruise',
   password: 'TomSawier2015',
   port: 5432,
 });
 
-// an example endpoint to fetch flights from a table named "flights"
+// Endpoint lettura voli.
 app.get('/api/flights', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM flights');
@@ -34,7 +30,7 @@ app.get('/api/flights', async (req, res) => {
   }
 });
 
-// fallback serve home page
+// Route principale.
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'home.html'));
 });
